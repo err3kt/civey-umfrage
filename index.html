@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deutsche Bundesländer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0e0e0e;
+      --cream: #f5f0e8;
+      --gold: #c9a84c;
+      --ink: #1a1a1a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--black);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.12) 0%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--cream);
+    }
+
+    h1 span { color: var(--gold); }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      margin: 22px auto 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 1040px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .state-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 4px;
+      padding: 16px 20px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .state-btn.active {
+      background: rgba(201,168,76,0.15);
+      border-color: var(--gold);
+    }
+
+    .state-btn:hover {
+      background: rgba(201,168,76,0.1);
+      border-color: rgba(201,168,76,0.55);
+      transform: translateY(-2px);
+    }
+
+    .state-btn:active { transform: translateY(0); }
+
+    .state-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.78rem;
+      color: var(--gold);
+      opacity: 0.7;
+      min-width: 20px;
+      font-weight: 700;
+    }
+
+    .state-name { flex: 1; letter-spacing: 0.02em; }
+
+    .arrow {
+      color: var(--gold);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.2s, transform 0.2s;
+      font-size: 0.85rem;
+    }
+
+    .state-btn:hover .arrow,
+    .state-btn.active .arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .polling-section {
+      width: 100%;
+      max-width: 1040px;
+      margin-top: 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .section-header h2 span { color: var(--gold); }
+
+    #polling-placeholder {
+      text-align: center;
+      padding: 48px 20px;
+      color: rgba(245,240,232,0.3);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      border: 1px dashed rgba(201,168,76,0.2);
+      border-radius: 4px;
+    }
+
+    #polling-placeholder span {
+      display: block;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    #polling-content { display: none; }
+
+    .polling-state-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .polling-state-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(201,168,76,0.2);
+    }
+
+    .polling-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .polling-table thead tr {
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+    }
+
+    .polling-table th {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding: 10px 16px 14px;
+      text-align: left;
+    }
+
+    .polling-table th:not(:first-child) { text-align: right; }
+
+    .polling-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.15s;
+    }
+
+    .polling-table tbody tr:hover { background: rgba(201,168,76,0.05); }
+
+    .polling-table td {
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      color: var(--cream);
+      vertical-align: middle;
+    }
+
+    .polling-table td:not(:first-child) { text-align: right; }
+
+    .party-cell { display: flex; align-items: center; gap: 12px; }
+
+    .party-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .party-name { font-weight: 500; letter-spacing: 0.02em; }
+
+    .bar-track {
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px;
+      height: 6px;
+      width: 100%;
+      overflow: hidden;
+      min-width: 120px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .pct-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .polling-note {
+      margin-top: 18px;
+      font-size: 0.72rem;
+      color: rgba(245,240,232,0.3);
+      letter-spacing: 0.05em;
+      text-align: right;
+    }
+
+    .polling-footer {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+    }
+
+    .source-label {
+      font-size: 0.72rem;
+      color: rgba(245,240,232,0.3);
+      letter-spacing: 0.05em;
+    }
+
+    .quelle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 3px;
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .quelle-btn:hover {
+      background: rgba(201,168,76,0.12);
+      border-color: var(--gold);
+      color: var(--cream);
+    }
+
+    .quelle-btn.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      cursor: default;
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.75rem;
+      color: rgba(245,240,232,0.25);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <p class="eyebrow">Bundesrepublik Deutschland</p>
+    <h1>Die 16 <span>Bundesländer</span></h1>
+    <div class="divider"></div>
+  </header>
+
+  <div class="grid">
+    <!--
+    ══════════════════════════════════════════════════════════
+    HOW TO USE:
+    • Replace href="#" with the website URL for each state
+    • The data-state="xx" keys link each button to the
+      polling data in the JavaScript section below
+    ══════════════════════════════════════════════════════════
+    -->
+    <a class="state-btn" href="#" target="_blank" data-state="bw">
+      <span class="state-num">01</span>
+      <span class="state-name">Baden-Württemberg</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="by">
+      <span class="state-num">02</span>
+      <span class="state-name">Bayern</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="be">
+      <span class="state-num">03</span>
+      <span class="state-name">Berlin</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="bb">
+      <span class="state-num">04</span>
+      <span class="state-name">Brandenburg</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="hb">
+      <span class="state-num">05</span>
+      <span class="state-name">Bremen</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="hh">
+      <span class="state-num">06</span>
+      <span class="state-name">Hamburg</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="he">
+      <span class="state-num">07</span>
+      <span class="state-name">Hessen</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="mv">
+      <span class="state-num">08</span>
+      <span class="state-name">Mecklenburg-Vorpommern</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="ni">
+      <span class="state-num">09</span>
+      <span class="state-name">Niedersachsen</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="nw">
+      <span class="state-num">10</span>
+      <span class="state-name">Nordrhein-Westfalen</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="rp">
+      <span class="state-num">11</span>
+      <span class="state-name">Rheinland-Pfalz</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="sl">
+      <span class="state-num">12</span>
+      <span class="state-name">Saarland</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="sn">
+      <span class="state-num">13</span>
+      <span class="state-name">Sachsen</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="st">
+      <span class="state-num">14</span>
+      <span class="state-name">Sachsen-Anhalt</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="sh">
+      <span class="state-num">15</span>
+      <span class="state-name">Schleswig-Holstein</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="state-btn" href="#" target="_blank" data-state="th">
+      <span class="state-num">16</span>
+      <span class="state-name">Thüringen</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <section class="polling-section">
+    <div class="section-header">
+      <div class="divider" style="margin-bottom:22px;"></div>
+      <h2>Partei <span>Umfragen</span></h2>
+      <div class="divider" style="margin-top:22px;"></div>
+    </div>
+
+    <div id="polling-placeholder">
+      <span>↑</span>
+      Bundesland auswählen um die Umfragedaten zu sehen
+    </div>
+
+    <div id="polling-content">
+      <p class="polling-state-title" id="polling-state-name"></p>
+      <table class="polling-table">
+        <thead>
+          <tr>
+            <th>Partei</th>
+            <th>%</th>
+            <th>Balken</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody id="polling-tbody"></tbody>
+      </table>
+      <div class="polling-footer">
+        <span class="source-label" id="polling-source"></span>
+        <a class="quelle-btn disabled" id="quelle-btn" href="#" target="_blank" rel="noopener noreferrer">
+          Quelle&nbsp;↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>© Deutsche Bundesländer — Alle Rechte vorbehalten</footer>
+
+  <script>
+  /*
+  ══════════════════════════════════════════════════════════════════════
+  POLLING DATA — edit the numbers inside each state block below
+  ══════════════════════════════════════════════════════════════════════
+
+  Each state has:
+    name    → display name shown above the table
+    source  → pollster + date shown as footnote (e.g. "Infratest dimap, März 2026")
+    parties → array of party entries, each with:
+                name  → party name/abbreviation
+                color → hex color for the dot and bar
+                pct   → polling % as a number  (e.g. 32.5)
+                trend → change string           (e.g. "▲ +1.2" / "▼ −0.5" / "—")
+
+  You can add or remove party entries freely — just copy/delete an object
+  inside the parties array. The bar widths scale automatically to the
+  highest value in that state's list.
+
+  Common German party colors:
+    CDU/CSU → #1a1a1a    SPD   → #e3000f    Grüne → #46962b
+    FDP     → #e8c200    AfD   → #009ee0    Linke → #be3075
+    BSW     → #6a0032    FW    → #f4792b    SSW   → #003f8a
+  ══════════════════════════════════════════════════════════════════════
+  */
+  const pollingData = {
+
+    bw: {
+      name: "Baden-Württemberg",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",
+      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    by: {
+      name: "Bayern",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    be: {
+      name: "Berlin",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    bb: {
+      name: "Brandenburg",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    hb: {
+      name: "Bremen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    hh: {
+      name: "Hamburg",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    he: {
+      name: "Hessen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    mv: {
+      name: "Mecklenburg-Vorpommern",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    ni: {
+      name: "Niedersachsen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    nw: {
+      name: "Nordrhein-Westfalen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    rp: {
+      name: "Rheinland-Pfalz",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    sl: {
+      name: "Saarland",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    sn: {
+      name: "Sachsen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    st: {
+      name: "Sachsen-Anhalt",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    sh: {
+      name: "Schleswig-Holstein",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+    th: {
+      name: "Thüringen",
+      source: "Quelle hier eintragen",
+      sourceUrl: "",      parties: [
+        { name: "Partei 1", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 2", color: "#555", pct: 0, trend: "—" },
+        { name: "Partei 3", color: "#555", pct: 0, trend: "—" },
+      ]
+    },
+
+  }; // ← end of pollingData
+
+  /* ── Rendering logic ── */
+  const placeholder = document.getElementById('polling-placeholder');
+  const content     = document.getElementById('polling-content');
+  const titleEl     = document.getElementById('polling-state-name');
+  const tbody       = document.getElementById('polling-tbody');
+  const sourceEl    = document.getElementById('polling-source');
+  const quelleBtn   = document.getElementById('quelle-btn');
+
+  function renderPolling(stateKey) {
+    const data = pollingData[stateKey];
+    if (!data) return;
+
+    const maxPct = Math.max(...data.parties.map(p => p.pct), 1);
+
+    titleEl.textContent = data.name;
+    sourceEl.textContent = data.source ? '* ' + data.source : '';
+
+    // Quelle button
+    if (data.sourceUrl) {
+      quelleBtn.href = data.sourceUrl;
+      quelleBtn.classList.remove('disabled');
+    } else {
+      quelleBtn.href = '#';
+      quelleBtn.classList.add('disabled');
+    }
+
+    tbody.innerHTML = data.parties.map(p => {
+      const barWidth = ((p.pct / maxPct) * 100).toFixed(1);
+      const trendColor = p.trend && p.trend.startsWith('▲')
+        ? '#6dbf67' : p.trend && p.trend.startsWith('▼')
+        ? '#e05c5c' : 'rgba(245,240,232,0.35)';
+      return `
+        <tr>
+          <td>
+            <div class="party-cell">
+              <div class="party-dot" style="background:${p.color}"></div>
+              <span class="party-name">${p.name}</span>
+            </div>
+          </td>
+          <td><span class="pct-value">${p.pct > 0 ? p.pct.toFixed(1) + '%' : '—'}</span></td>
+          <td>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${barWidth}%;background:${p.color}"></div>
+            </div>
+          </td>
+          <td style="color:${trendColor};font-size:0.85rem">${p.trend || '—'}</td>
+        </tr>`;
+    }).join('');
+
+    placeholder.style.display = 'none';
+    content.style.display = 'block';
+
+    document.querySelector('.polling-section')
+      .scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.querySelectorAll('.state-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const stateKey = btn.dataset.state;
+      const href = btn.getAttribute('href');
+
+      // highlight active button
+      document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // update polling table
+      renderPolling(stateKey);
+
+      // if a real URL is set, open it in a new tab separately
+      if (href && href !== '#') {
+        window.open(href, '_blank');
+      }
+
+      e.preventDefault();
+    });
+  });
+  </script>
+
+</body>
+</html>
